@@ -1,0 +1,80 @@
+# GitHub Pages 배포 가이드
+
+AI Studio에서 GitHub으로 내보낸 후, 사이트가 정상적으로 작동하게 하려면 다음 설정을 수동으로 진행해야 합니다.
+
+## 1. GitHub Actions 설정 (권장)
+
+GitHub 저장소에서 직접 워크플로우 파일을 생성하여 자동 배포를 설정할 수 있습니다.
+
+1. GitHub 저장소 상단의 **Actions** 탭을 클릭합니다.
+2. **"set up a workflow yourself"** 링크를 클릭합니다.
+3. 파일 이름을 `deploy.yml`로 정하고 아래 내용을 복사해서 붙여넣습니다.
+4. **Commit changes...** 버튼을 눌러 저장합니다.
+
+```yaml
+name: Deploy static content to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+## 2. GitHub Pages 설정 변경
+
+1. 저장소의 **Settings** -> **Pages** 탭으로 이동합니다.
+2. **Build and deployment** > **Source**를 **"GitHub Actions"**로 변경합니다.
+
+---
+
+## 3. 로컬에서 수동 배포하는 방법 (gh-pages 사용)
+
+GitHub Actions를 쓰지 않고 직접 배포하려면 다음 과정을 따르세요.
+
+1. `package.json`에 다음 설정을 추가합니다:
+   ```json
+   "scripts": {
+     "predeploy": "npm run build",
+     "deploy": "gh-pages -d dist"
+   }
+   ```
+2. 터미널에서 실행:
+   - `npm install gh-pages --save-dev`
+   - `npm run deploy`
