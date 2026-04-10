@@ -209,11 +209,9 @@ export default function App() {
               판교 맛집 가이드
             </h1>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="rounded-full gap-1 border-orange-200 text-orange-600 hover:bg-orange-50">
-                  <Plus className="w-4 h-4" />
-                  맛집 추가
-                </Button>
+              <DialogTrigger render={<Button variant="outline" size="sm" className="rounded-full gap-1 border-orange-200 text-orange-600 hover:bg-orange-50" />}>
+                <Plus className="w-4 h-4" />
+                맛집 추가
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
@@ -227,7 +225,7 @@ export default function App() {
                     <Label htmlFor="url">네이버 지도 URL</Label>
                     <Input 
                       id="url" 
-                      placeholder="https://naver.me/..." 
+                      placeholder="https://naver.me/... 또는 https://m.place.naver.com/..." 
                       value={formData.url}
                       onChange={e => setFormData({...formData, url: e.target.value})}
                     />
@@ -404,10 +402,14 @@ export default function App() {
                     <div className="flex gap-4 p-4">
                       <div className="w-24 h-24 rounded-xl bg-neutral-100 shrink-0 overflow-hidden relative">
                         <img 
-                          src={`https://picsum.photos/seed/${r.id}/200/200`} 
+                          src={r.id.length < 5 ? `https://picsum.photos/seed/${r.id}/200/200` : `https://picsum.photos/seed/${r.name}/200/200`} 
                           alt={r.name}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=200&h=200&auto=format&fit=crop";
+                          }}
                         />
                         <Badge className="absolute top-1 left-1 bg-white/90 text-neutral-900 text-[10px] px-1.5 py-0 border-none">
                           {r.category}
