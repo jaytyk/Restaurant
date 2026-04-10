@@ -1,0 +1,5 @@
+{
+  "name": "판교 맛집 가이드",
+  "description": "판교 인근의 추천 맛집 정보를 거리와 평점과 함께 제공합니다.",
+  "requestFramePermissions": ["geolocation"]
+}
